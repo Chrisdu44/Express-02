@@ -16,11 +16,12 @@ app.get("/", welcome);
 const movieHandlers = require("./movieHandlers");
 const userHandlers = require("./userHandlers");
 
+const { hashPassword } = require("./auth.js");
 const { validateMovie } = require("./validators.js");
 const { validateUser } = require("./validators.js");
 
 app.post("/api/movies", validateMovie, movieHandlers.postMovie);
-app.post("/api/users", validateUser, userHandlers.postUser);
+app.post("/api/users", hashPassword, userHandlers.postUser);
 
 app.put("/api/movies", validateMovie, movieHandlers.updateMovie);
 app.put("/api/movies/:id", validateMovie, movieHandlers.updateMovie);
