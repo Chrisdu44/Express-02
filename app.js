@@ -16,22 +16,29 @@ app.get("/", welcome);
 const movieHandlers = require("./movieHandlers");
 const userHandlers = require("./userHandlers");
 
-const { hashPassword } = require("./auth.js");
+
 const { validateMovie } = require("./validators.js");
 const { validateUser } = require("./validators.js");
+const { hashPassword, verifyPassword, verifyToken } = require("./auth");
 
-app.post("/api/movies", validateMovie, movieHandlers.postMovie);
+//the public routes
+app.get("/api/movies", movieHandlers.getMovies);
+app.get("/api/movies/:id", movieHandlers.getMovieById);
+app.get("/api/users", userHandlers.getUsers);
+app.get("/api/users/:id", userHandlers.getUserById);
+
 app.post("/api/users", hashPassword, userHandlers.postUser);
+app.post("/api/login", userHandlers.getUserByEmailWithPasswordAndPassToNext, verifyPassword);
+
+app.use(verifyToken);
+
+// the private routes
+app.post("/api/movies", verifyToken, movieHandlers.postMovie);
 
 app.put("/api/movies", validateMovie, movieHandlers.updateMovie);
 app.put("/api/movies/:id", validateMovie, movieHandlers.updateMovie);
 app.put("/api/users", validateUser, userHandlers.updateUser);
 app.put("/api/users/:id", validateUser, userHandlers.updateUser);
-
-app.get("/api/movies", movieHandlers.getMovies);
-app.get("/api/movies/:id", movieHandlers.getMovieById);
-app.get("/api/users", userHandlers.getUsers);
-app.get("/api/users/:id", userHandlers.getUserById);
 
 app.delete("/api/movies/:id", movieHandlers.deleteMovie);
 app.delete("/api/users/:id", userHandlers.deleteUser);
